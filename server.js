@@ -18,3 +18,6 @@ app.use(errorHandler);
 app.listen(port, "0.0.0.0", function () {
   console.log(`Server running on port ${port}`);
 });
+app.on('error', (err) => {
+  console.error('Server error:', err);
+});
