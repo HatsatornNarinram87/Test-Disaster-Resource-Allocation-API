@@ -4,9 +4,14 @@ class AreasController {
     static addArea(req, res) {
         try {
             // insert area to redis
-            AreasService.createAreas(req, res);
+            const result = AreasService.createAreas(req.body);
+            if (result.success) {
+                res.json({ message: "Areas created successfully" });
+            } else {
+                res.json({ error: result.error });
+            }
         } catch (error) {
-            res.status(500).json({ error: error.message });
+            res.json({ error: error.message });
         }
     }
 }

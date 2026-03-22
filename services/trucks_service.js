@@ -1,16 +1,14 @@
-import RedisModel from "../models/redis_model.js";
+import { RedisModel } from "../models/redis_model.js";
 
 class TrucksService {
-    static async addTruck(req, res) {
+    static async addTruck(body) {
         try {
-            for (const truck of req.body) {
-                await RedisModel.connect();
-                await RedisModel.insert("trucks", truck);
-                await RedisModel.disconnect();
-            }
-            res.status(201).json({ message: "Trucks created successfully" });
+
+            await RedisModel.insert("trucks", body);
+
+            return { success: true };
         } catch (error) {
-            res.status(400).json({ error: error.message });
+            return { success: false, error: error.message };
         }
     }
 

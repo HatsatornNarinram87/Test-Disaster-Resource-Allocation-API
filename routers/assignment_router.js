@@ -3,7 +3,8 @@ import AssignmentsController from '../controllers/assignments_controller.js';
 
 const router = express.Router();
 
-router.post('/assignments', AssignmentsController.processAssignments);
-router.get('/assignments', AssignmentsController.getAssignments);
+router.post('/', AssignmentsController.processAssignments);
+router.get('/', AssignmentsController.getAssignments);
+router.delete('/', AssignmentsController.deleteAssignment);
 
 export default router;

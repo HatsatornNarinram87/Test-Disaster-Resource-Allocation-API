@@ -4,6 +4,6 @@ import AreaInterfaceRouter from './interface/area_interface_router.js';
 
 const router = express.Router();
 
-router.post('/areas', AreaInterfaceRouter.addArea, AreasController.addArea);
+router.post('/', AreaInterfaceRouter.addArea, AreasController.addArea);
 
 export default router;

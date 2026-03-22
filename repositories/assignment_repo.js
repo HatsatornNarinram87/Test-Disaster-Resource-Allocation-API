@@ -1,70 +1,88 @@
-
+import { RedisModel } from "../models/redis_model.js";
 
 function canDeliver(truck, area) {
-    try {
-        const required = area.requiredResources;
-        const available = truck.availableResources;
+    const required = area.RequiredResources;
+    const available = truck.AvailableResources;
 
-        for (const resource in required) {
-            if (!available[resource] || available[resource] < required[resource]) {
-                return false;
-            }
+    for (const key in required) {
+        if (!available[key]) {
+            return { ok: false, reason: "missing_resource" };
         }
-
-        return true;
-    } catch (error) {
-        throw error;
+        if (available[key] < required[key]) {
+            return { ok: false, reason: "partial_resource" };
+        }
     }
+
+    return { ok: true };
 }
 
-async function assignTrucks(areas, trucks) {
-    try {
+export async function assignTrucks(areas, trucks) {
+    const result = [];
+    const usedTrucks = new Set();
 
-        const result = [];
-        const usedTrucks = [];
+    // sort by urgency
+    areas.sort((a, b) => b.UrgencyLevel - a.UrgencyLevel);
 
-        // Sort areas by urgency (highest first)
-        areas.sort((a, b) => b.urgency - a.urgency);
+    for (const area of areas) {
+        let assigned = false;
+        let hasResourceMatch = false;
+        let hasTimeMatch = false;
 
-        for (const area of areas) {
-            let assigned = false;
+        for (const truck of trucks) {
+            if (usedTrucks.has(truck.TruckID)) continue;
 
-            for (const truck of trucks) {
-                if (usedTrucks.includes(truck.id)) continue;
+            const deliveryCheck = canDeliver(truck, area);
+
+            if (deliveryCheck.ok) {
+                hasResourceMatch = true;
+
+                const travelTime = truck.TravelTimeToArea?.[area.AreaID];
 
                 if (
-                    canDeliver(truck, area) &&
-                    truck.travelTime[area.id] <= area.timeConstraint
+                    typeof travelTime === "number" &&
+                    travelTime <= area.TimeConstraint
                 ) {
+                    hasTimeMatch = true;
+
                     result.push({
-                        areaId: area.id,
-                        truckId: truck.id,
-                        resourcesDelivered: area.requiredResources
+                        AreaID: area.AreaID,
+                        TruckID: truck.TruckID,
+                        ResourcesDelivered: area.RequiredResources,
                     });
 
-                    usedTrucks.push(truck.id); // เก็บ id ลง array
+                    usedTrucks.add(truck.TruckID);
                     assigned = true;
                     break;
                 }
             }
-
-            if (!assigned) {
-                result.push({
-                    areaId: area.id,
-                    message: "No available truck"
-                });
-            }
         }
-        result.sort((a, b) => a.areaId - b.areaId);
-        await RedisModel.connect();
-        await RedisModel.insert("assignment", result);
-        await RedisModel.disconnect();
-        return result;
-    } catch (error) {
-        throw error;
-    }
-}
 
-export default {
-    assignTrucks
+        if (!assigned) {
+            let message = "No available truck";
+
+            if (!hasResourceMatch) {
+                message = "Insufficient resources";
+            } else if (!hasTimeMatch) {
+                message = "No truck can meet time constraint";
+            }
+
+            result.push({
+                AreaID: area.AreaID,
+                Message: message,
+            });
+        }
+    }
+
+    // sort output
+    result.sort((a, b) => a.AreaID.localeCompare(b.AreaID));
+
+    // cache in Redis 30 mins
+    await RedisModel.insert(
+        "assignments",
+        JSON.stringify(result),
+        "EX",
+        1800
+    );
+
+    return result;
 }

@@ -1,35 +1,41 @@
-import RedisModel from "../models/redis_model.js";
-import assignTrucks from "../repositories/assignment_repo.js";
+import { RedisModel } from "../models/redis_model.js";
+import { assignTrucks } from "../repositories/assignment_repo.js";
 
 class AssignmentService {
     static async processAssignments() {
-        await RedisModel.connect();
+
         const areas = await RedisModel.get("areas");
         const trucks = await RedisModel.get("trucks");
-        await RedisModel.disconnect();
-        try {
-            assignTrucks(areas, trucks);
-            return "Assignment processed successfully";
 
+        try {
+            const result = await assignTrucks(areas, trucks);
+            console.log("Assignment result:", result);
+            return { success: true, result };
         } catch (error) {
-            throw error;
+            return { success: false, error: error.message };
         }
     }
 
     static async getAssignments() {
-        await RedisModel.connect();
-        const cached = await RedisModel.get("assignment");
-        await RedisModel.disconnect();
 
-        if (cached) return JSON.parse(cached);
+        const cached = await RedisModel.get("assignments");
+
+        if (cached) {
+            try {
+                return cached;
+            } catch (err) {
+                console.error("JSON parse error:", err);
+                return cached; // fallback
+            }
+        }
         return [];
     }
-    static async deleteAssignment(req, res) {
+    static async deleteAssignment() {
         try {
-            await RedisModel.connect();
+
             await RedisModel.delete(`assignment`);
-            await RedisModel.disconnect();
-            res.status(200).json({ message: "Assignment deleted successfully" });
+
+            return { success: true };
         } catch (error) {
             res.status(400).json({ error: error.message });
         }

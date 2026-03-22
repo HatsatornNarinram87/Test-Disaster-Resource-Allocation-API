@@ -1,11 +1,11 @@
 // redis model
-import { redisConfig } from "../configs/redis_config.js";
+import { redisClient } from "../configs/redis_config.js";
 
 export class RedisModel {
 
     static async connect() {
         try {
-            await redisConfig.connect();
+            await redisClient.connect();
             console.log("✅ Redis connected");
         } catch (err) {
             console.error("❌ Redis connect failed:", err);
@@ -13,17 +13,18 @@ export class RedisModel {
     }
     static async disconnect() {
         try {
-            await redisConfig.disconnect();
+            await redisClient.disconnect();
             console.log("✅ Redis disconnected");
         } catch (err) {
             console.error("❌ Redis disconnect failed:", err);
         }
     }
-    static async insert(key, value) {
+    static async insert(key, value, ...args) {
         try {
             await this.connect();
             const data = JSON.stringify(value);
-            await redisConfig.set(key, data);
+            await redisClient.set(key, data, ...args);
+            await this.disconnect();
             return true;
         } catch (err) {
             console.error("Insert error:", err);
@@ -34,7 +35,8 @@ export class RedisModel {
     static async get(key) {
         try {
             await this.connect();
-            const data = await redisConfig.get(key);
+            const data = await redisClient.get(key);
+            await this.disconnect();
             return data ? JSON.parse(data) : null;
         } catch (err) {
             console.error("Get error:", err);
@@ -45,7 +47,8 @@ export class RedisModel {
     static async delete(key) {
         try {
             await this.connect();
-            await redisConfig.del(key);
+            await redisClient.del(key);
+            await this.disconnect();
             return true;
         } catch (err) {
             console.error("Delete error:", err);
@@ -56,11 +59,12 @@ export class RedisModel {
     static async update(key, value) {
         try {
             await this.connect();
-            const exists = await redisConfig.exists(key);
+            const exists = await redisClient.exists(key);
             if (!exists) return false;
 
             const data = JSON.stringify(value);
-            await redisConfig.set(key, data);
+            await redisClient.set(key, data);
+            await this.disconnect();
             return true;
         } catch (err) {
             console.error("Update error:", err);

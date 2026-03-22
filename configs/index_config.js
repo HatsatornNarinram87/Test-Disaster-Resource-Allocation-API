@@ -1,2 +1,2 @@
 // Index configuration
-export { redisConfig } from './redis_config';
+export { redisClient } from './redis_config';

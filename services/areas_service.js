@@ -1,16 +1,14 @@
-import RedisModel from "../models/redis_model.js";
+import { RedisModel } from "../models/redis_model.js";
 
 class AreasService {
-    static async createAreas(req, res) {
+    static async createAreas(body) {
         try {
-            for (const area of req.body) {
-                await RedisModel.connect();
-                await RedisModel.insert("area", area);
-                await RedisModel.disconnect();
-            }
-            res.status(201).json({ message: "Areas created successfully" });
+
+            await RedisModel.insert("areas", body);
+
+            return { success: true };
         } catch (error) {
-            res.status(400).json({ error: error.message });
+            return { success: false, error: error.message };
         }
     }
 }

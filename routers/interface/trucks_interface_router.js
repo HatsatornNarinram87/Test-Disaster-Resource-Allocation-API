@@ -14,8 +14,8 @@ const resourceSchema = z.record(z.number());
 // ]
 const truckSchema = z.object({
     TruckID: z.string(),
-    AvailableResources: resourceSchema,
-    TravelTimeToArea: z.record(z.number())
+    AvailableResources: z.record(z.string(), z.number()),
+    TravelTimeToArea: z.record(z.string(), z.number()),
 });
 
 const requestSchema = z.array(truckSchema);
@@ -26,7 +26,7 @@ class TrucksInterfaceRouter {
 
         if (!result.success) {
             return res.status(400).json({
-                error: result.error.format()
+                error: result.error.issues
             });
         }
 

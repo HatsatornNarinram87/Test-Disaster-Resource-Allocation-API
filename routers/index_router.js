@@ -1,14 +1,11 @@
 import express from 'express';
 const router = express.Router();
-const areaRouter = await import('./area_router');
-const trucksRouter = await import('./trucks_router');
-const assignmentRouter = await import('./assignment_router');
-router.get('/', (req, res) => {
-    res.send('Hello World!');
-});
+import areaRouter from './area_router.js';
+import trucksRouter from './trucks_router.js';
+import assignmentRouter from './assignment_router.js';
 
-router.use('/areas', areaRouter.default);
-router.use('/trucks', trucksRouter.default);
-router.use('/assignments', assignmentRouter.default);
+router.use('/areas', areaRouter);
+router.use('/trucks', trucksRouter);
+router.use('/assignments', assignmentRouter);
 
 export default router;
