@@ -17,7 +17,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "nodemon server.js NODE_ENV=development",
-    "start:prod": "set NODE_ENV=production && nodemon server.js"
+    "start:prod": "NODE_ENV=production nodemon server.js"
   },
   "dependencies": {
     "body-parser": "^2.2.2",
