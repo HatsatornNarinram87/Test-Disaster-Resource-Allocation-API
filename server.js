@@ -1,6 +1,7 @@
 import express from 'express';
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
+
 
 import indexRouter from './routers/index_router.js';
 import errorHandler from './middlewares/error_hander.js';
@@ -8,10 +9,13 @@ import bodyParser from 'body-parser';
 import { RedisModel } from './models/redis_model.js';
 
 app.use(bodyParser.json());
-
+app.get("/", (req, res) => {
+  res.send("OK");
+});
 app.use('/api', indexRouter);
 
 app.use(errorHandler);
+
 app.listen(port, "0.0.0.0", () => {
-    console.log(`Example app listening on port ${port}`);
+  console.log("Example app listening on port " + port);
 });

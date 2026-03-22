@@ -14,7 +14,7 @@ static async connect() {
     } catch (err) {
         console.error("❌ Redis connect failed:", err.message);
     }
-}โ
+}
 
     static async insert(key, value, ...args) {
         try {
