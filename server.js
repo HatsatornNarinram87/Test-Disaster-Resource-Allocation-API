@@ -14,6 +14,7 @@ app.get("/", (req, res) => {
 });
 app.use('/api', indexRouter);
 
+RedisModel.connect();
 app.use(errorHandler);
 app.listen(port, "0.0.0.0", function () {
   console.log(`Server running on port ${port}`);
