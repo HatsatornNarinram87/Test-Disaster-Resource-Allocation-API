@@ -16,10 +16,12 @@
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon server.js"
+    "start": "nodemon server.js NODE_ENV=development",
+    "start:prod": "set NODE_ENV=production && nodemon server.js"
   },
   "dependencies": {
     "body-parser": "^2.2.2",
+    "dotenv": "^17.3.1",
     "express": "^5.2.1",
     "nodemon": "^3.1.14",
     "redis": "^5.11.0",
