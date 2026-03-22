@@ -33,7 +33,7 @@ class AssignmentService {
     static async deleteAssignment() {
         try {
 
-            await RedisModel.delete(`assignment`);
+            await RedisModel.delete(`assignments`);
 
             return { success: true };
         } catch (error) {
