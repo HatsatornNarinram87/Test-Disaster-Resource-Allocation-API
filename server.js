@@ -10,8 +10,8 @@ import { RedisModel } from './models/redis_model.js';
 app.use(bodyParser.json());
 
 app.use('/api', indexRouter);
-await RedisModel.connect();
+
 app.use(errorHandler);
-app.listen(port, () => {
+app.listen(port, "0.0.0.0", () => {
     console.log(`Example app listening on port ${port}`);
 });
