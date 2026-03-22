@@ -1,7 +1,7 @@
 import { createClient } from "redis";
 import dotenv from "dotenv";
 
-const env = process.env.NODE_ENV.trim() || "development".trim();
+const env = (process.env.NODE_ENV || "development").trim();
 console.log("ENV:", env);
 dotenv.config({
   path: `.env.${env}`
