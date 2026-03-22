@@ -4,6 +4,18 @@ function canDeliver(truck, area) {
     const required = area.RequiredResources;
     const available = truck.AvailableResources;
 
+    /*
+    "RequiredResources": {
+            "food": 200,
+            "water": 300
+        }
+    */
+    /*
+    "AvailableResources": {
+             "food": 250,
+             "water": 300
+         }
+    */
     for (const key in required) {
         if (!available[key]) {
             return { ok: false, reason: "missing_resource" };
